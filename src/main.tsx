@@ -5,10 +5,7 @@ import App from "./pages/App";
 import "./index.css";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    loader: () => redirect(`/l/${crypto.randomUUID()}`),
-  },
+  { path: "/", loader: () => redirect(`/l/${crypto.randomUUID()}`) },
   { path: "/l/:listId", element: <App /> },
 ]);
 

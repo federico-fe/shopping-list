@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // only server-side
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // server-side only
 );
 
 const json = (status: number, data: any) => ({
@@ -28,7 +28,7 @@ export const handler: Handler = async (event) => {
       const listId = seg[1];
       const { data, error } = await supabase
         .from("items")
-        .select("id,label,done,updated_at")
+        .select("id,label,done,updated_at,qty")
         .eq("list_id", listId)
         .order("updated_at", { ascending: false });
       if (error) return json(500, { error: error.message });
@@ -37,12 +37,13 @@ export const handler: Handler = async (event) => {
 
     if (httpMethod === "POST" && seg[0] === "lists" && seg[1] && seg[2] === "items") {
       const listId = seg[1];
-      const { label } = JSON.parse(body || "{}");
+      const { label, qty } = JSON.parse(body || "{}");
       if (!label) return json(400, { error: "label required" });
+      const toInsert: any = { list_id: listId, label, qty: typeof qty === "number" ? qty : 1 };
       const { data, error } = await supabase
         .from("items")
-        .insert({ list_id: listId, label })
-        .select("id,label,done,updated_at")
+        .insert(toInsert)
+        .select("id,label,done,updated_at,qty")
         .single();
       if (error) return json(500, { error: error.message });
       return json(200, { item: data });
@@ -57,7 +58,7 @@ export const handler: Handler = async (event) => {
         .update(patch)
         .eq("id", itemId)
         .eq("list_id", listId)
-        .select("id,label,done,updated_at")
+        .select("id,label,done,updated_at,qty")
         .single();
       if (error) return json(500, { error: error.message });
       return json(200, { item: data });

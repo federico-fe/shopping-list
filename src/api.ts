@@ -9,11 +9,11 @@ export const api = {
     const res = await fetch(`${base}/lists/${listId}`);
     return res.json() as Promise<{ items: any[] }>;
   },
-  addItem: async (listId: string, label: string) => {
+  addItem: async (listId: string, label: string, qty: number = 1) => {
     const res = await fetch(`${base}/lists/${listId}/items`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ label }),
+      body: JSON.stringify({ label, qty }),
     });
     return res.json();
   },

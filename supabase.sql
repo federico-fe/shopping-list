@@ -1,4 +1,6 @@
--- Supabase schema for MVP
+-- Schema con quantità
+create extension if not exists pgcrypto;
+
 create table if not exists public.lists (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now()
@@ -9,6 +11,7 @@ create table if not exists public.items (
   list_id uuid not null references public.lists(id) on delete cascade,
   label text not null,
   done boolean not null default false,
+  qty int not null default 1,
   updated_at timestamptz not null default now()
 );
 
